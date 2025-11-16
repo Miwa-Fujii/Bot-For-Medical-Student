@@ -2,7 +2,7 @@
   "profiles": {
     "BotForMedicalStudent": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7025",
+      "commandLineArgs": "--port 7259",
       "launchBrowser": false
     }
   }
