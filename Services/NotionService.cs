@@ -18,57 +18,31 @@ namespace BotForMedicalStudent.Services
             _env = env;
             _time = time;
         }
-
-        // public async Task<bool> HasStudiedTodayAsync()
-        // {
-        //     var apiKey = _env.GetEnvironmentVariable("NOTION_API_KEY");
-        //     var dbId = _env.GetEnvironmentVariable("NOTION_DATA_SOURCE_ID");
-        //     var (start, end) = _time.GetJstTodayUtcRange();
-
-        //     // Notion APIへのリクエスト(手紙)を作成
-        //     var requestBody = new NotionQueryRequest
-        //     {
-        //         Filter = new NotionFilter
-        //         {
-        //             And = new System.Collections.Generic.List<object>
-        //             {
-        //                 new NotionDateFilterContainer { Date = new NotionDateFilter { OnOrAfter = start } },
-        //                 new NotionDateFilterContainer { Date = new NotionDateFilter { OnOrBefore = end } },
-        //                 new NotionStatusFilterContainer { Status = new NotionStatusFilter { DoesNotEqual = "未着手" } }
-        //             }
-        //         }
-        //     };
-
-        //     // APIを呼び出すためのヘッダー情報を設定
-        //     _httpClient.DefaultRequestHeaders.Clear();
-        //     _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-        //     _httpClient.DefaultRequestHeaders.Add("Notion-Version", Constants.NotionVersion);
-
-        //     // POST送信！
-        //     var response = await _httpClient.PostAsJsonAsync($"{Constants.NotionApiBaseUrl}{dbId}/query", requestBody);
-        //     response.EnsureSuccessStatusCode();
-
-        //     // 結果を受け取る
-        //     var result = await response.Content.ReadFromJsonAsync<NotionQueryResponse>();
-            
-        //     // 検索結果が1件以上あれば「勉強した」とみなす
-        //     return result?.Results?.Count > 0;
-        // }
         public async Task<Dictionary<string, int>> GetStudyCountsByCategoryAsync()
         {
             var apiKey = _env.GetEnvironmentVariable("NOTION_API_KEY");
             var dbId = _env.GetEnvironmentVariable("NOTION_DATA_SOURCE_ID");
             var (start, end) = _time.GetJstTodayUtcRange();
 
-            var requestBody = new NotionQueryRequest { Filter = new NotionFilter
+        // --- 修正ポイント：フィルタ条件を「日付のみ」にします ---
+            var requestBody = new NotionQueryRequest
+            {
+                Filter = new NotionFilter
                 {
                     And = new System.Collections.Generic.List<object>
                     {
-                        new NotionDateFilterContainer { Date = new NotionDateFilter { OnOrAfter = start } },
-                        new NotionDateFilterContainer { Date = new NotionDateFilter { OnOrBefore = end } },
-                        new NotionStatusFilterContainer { Status = new NotionStatusFilter { DoesNotEqual = "未着手" } }
+                    // 「最終更新日時」が「今日（JST）」の範囲内であること
+                        new NotionDateFilterContainer { 
+                            Property = "最終更新日時", // ここがNotion側の実際の項目名と合っているか確認！
+                            Date = new NotionDateFilter { OnOrAfter = start } 
+                        },
+                        new NotionDateFilterContainer { 
+                            Property = "最終更新日時", // 同上
+                            Date = new NotionDateFilter { OnOrBefore = end } 
+                        }
+                // 【削除】ステータスのフィルタを消しました
                     }
-                } 
+                }
             };
 
             _httpClient.DefaultRequestHeaders.Clear();
@@ -79,20 +53,19 @@ namespace BotForMedicalStudent.Services
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadFromJsonAsync<NotionQueryResponse>();
-            
-            // --- ここでグループ集計（Group By）を行います ---
+    
             var counts = new Dictionary<string, int>();
             if (result?.Results != null)
             {
-                foreach (var page in result.Results)
+                foreach (var page in result.Results)    
                 {
-                    // 「カテゴリ」が未設定の場合は「未分類」とする
-                    var categoryName = page.Properties?.Category?.Select?.Name ?? "未分類";
-                    
-                    if (counts.ContainsKey(categoryName))
-                        counts[categoryName]++;
-                    else
-                        counts[categoryName] = 1;
+                // プロパティ「範囲」からカテゴリ名を取得（以前の修正を反映）
+                var categoryName = page.Properties?.Category?.Select?.Name ?? "未分類";
+            
+                if (counts.ContainsKey(categoryName))
+                    counts[categoryName]++;
+                else
+                    counts[categoryName] = 1;
                 }
             }
             return counts;

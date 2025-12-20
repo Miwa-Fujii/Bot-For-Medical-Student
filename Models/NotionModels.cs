@@ -72,7 +72,7 @@ namespace BotForMedicalStudent.Models
 
     public class NotionProperties
     {
-        [JsonPropertyName("カテゴリ")]
+        [JsonPropertyName("範囲")]
         public NotionSelectProperty? Category { get; set; }
     }
 
