@@ -75,12 +75,11 @@ namespace BotForMedicalStudent
                 var studyCounts = await _notion.GetStudyCountsByCategoryAsync();
 
                 string message;
+                var todayJst = DateTime.UtcNow.AddHours(9);
                 if (studyCounts.Count > 0)
                 {
                     // 賞賛メッセージの組み立て
                     var sb = new System.Text.StringBuilder();
-                    // 1. 日本時間の今日を取得
-                    var todayJst = DateTime.UtcNow.AddHours(9);
 
                     // 2. 日付を【yyyy-MM-dd】の形式で追加
                     sb.AppendLine($"【{todayJst:yyyy-MM-dd}】");
@@ -96,7 +95,10 @@ namespace BotForMedicalStudent
                 else
                 {
                     // 1件もない場合は、環境変数の警告メッセージを使う
-                    message = _env.GetEnvironmentVariable("WARNING_MESSAGE");
+                    var sb = new System.Text.StringBuilder();
+                    sb.AppendLine($"【{todayJst:yyyy-MM-dd}】");
+                    sb.AppendLine(_env.GetEnvironmentVariable("WARNING_MESSAGE"));
+                    message = sb.ToString().TrimEnd();
                 }
 
                 await _line.SendPushMessageAsync(boyfriendId, message);
