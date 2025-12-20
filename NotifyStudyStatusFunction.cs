@@ -79,6 +79,11 @@ namespace BotForMedicalStudent
                 {
                     // 賞賛メッセージの組み立て
                     var sb = new System.Text.StringBuilder();
+                    // 1. 日本時間の今日を取得
+                    var todayJst = DateTime.UtcNow.AddHours(9);
+
+                    // 2. 日付を【yyyy-MM-dd】の形式で追加
+                    sb.AppendLine($"【{todayJst:yyyy-MM-dd}】");
                     string praiseMsg = _env.GetEnvironmentVariable("PRAISE_MESSAGE");
                     sb.AppendLine(praiseMsg);
                     sb.AppendLine("\n【学習内容】");
