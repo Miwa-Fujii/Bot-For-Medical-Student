@@ -64,7 +64,7 @@ namespace BotForMedicalStudent
         //     }
         // }
         [Function("NotifyStudyStatusFunction")]
-        public async Task Run([TimerTrigger("0 0 22 * * *")] TimerInfo myTimer)
+        public async Task Run([TimerTrigger("0 30 13 * * *")] TimerInfo myTimer)
         {
             try
             {
