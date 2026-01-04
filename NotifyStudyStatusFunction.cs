@@ -43,6 +43,8 @@ namespace BotForMedicalStudent
                     // 2. 日付を【yyyy-MM-dd】の形式で追加
                     sb.AppendLine($"【{todayJst:yyyy-MM-dd}】");
 
+                    //TODO: 賞賛メッセージ作成を関数化する
+                    //TODO: 賞賛メッセージを環境変数からの取得でいいのか考える
                     var praiseMsg = "" ;
                     if(studyCounts.Count<=10){
                         praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_1_TO_10");
