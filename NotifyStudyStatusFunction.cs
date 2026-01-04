@@ -36,6 +36,7 @@ namespace BotForMedicalStudent
                 string message;
                 var todayJst = DateTime.UtcNow.AddHours(9);
                 if (studyCounts.Count > 0)
+                //studyCountsが1:勉強した、0:勉強していない
                 {
                     // 賞賛メッセージの組み立て
                     var sb = new System.Text.StringBuilder();
@@ -45,17 +46,22 @@ namespace BotForMedicalStudent
 
                     //TODO: 賞賛メッセージ作成を関数化する
                     //TODO: 賞賛メッセージを環境変数からの取得でいいのか考える
-                    var praiseMsg = "" ;
-                    if(studyCounts.Count<=10){
+                    int sum = 0;
+                    foreach (var kvp in studyCounts)
+                    {
+                        sum += kvp.Value;
+                    }
+                    string praiseMsg = _env.GetEnvironmentVariable("PRAISE_MESSAGE");
+                    if(sum<=10){
                         praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_1_TO_10");
                     }
-                    else if(studyCounts.Count<=20){
+                    else if(sum<=20){
                         praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_11_TO_20");
                     }
-                    else if(studyCounts.Count<=30){
+                    else if(sum<=30){
                         praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_21_TO_30");
                     }
-                    else if(studyCounts.Count<=40){
+                    else if(sum<=40){
                         praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_31_TO_40");
                     }
                     else{
