@@ -22,47 +22,6 @@ namespace BotForMedicalStudent
             _logger = loggerFactory.CreateLogger<NotifyStudyStatusFunction>();
         }
 
-        // 日本時間 20:00 (UTC 11:00) に起動 [cite: 410]
-        // [Function("NotifyStudyStatusFunction")]
-        // public async Task Run([TimerTrigger("0 0 11 * * *")] TimerInfo myTimer)
-        // {
-        //     _logger.LogInformation($"実行開始: {DateTime.Now}");
-        //     try 
-        //     // 正常系フロー [cite: 413]
-        //     {
-        //         var myId = _env.GetEnvironmentVariable("MY_LINE_USER_ID");
-        //         var boyfriendId = _env.GetEnvironmentVariable("BOYFRIEND_LINE_USER_ID");
-
-        //         // Notionに勉強記録を確認 [cite: 415]
-        //         bool hasStudied = await _notion.HasStudiedTodayAsync();
-
-        //         string warningMsg = _env.GetEnvironmentVariable("WARNING_MESSAGE");
-        //         string praiseMsg = _env.GetEnvironmentVariable("PRAISE_MESSAGE");
-        //         // 判定結果に応じたメッセージを決定 [cite: 416]
-        //         string message = hasStudied 
-        //             ? praiseMsg : warningMsg;
-
-        //         // 彼氏と自分に送信 [cite: 417, 418]
-        //         await _line.SendPushMessageAsync(boyfriendId, message);
-        //         await _line.SendPushMessageAsync(myId, message);
-        //     }
-        //     catch (Exception ex) // 異常系（エラー）フロー [cite: 420]
-        //     {
-        //         _logger.LogError(ex, "予期せぬエラーが発生しました");
-
-        //         try
-        //         {
-        //     // 開発者（あなた）にのみエラー通知を試みる [cite: 424]
-        //             var myId = _env.GetEnvironmentVariable("MY_LINE_USER_ID");
-        //             await _line.SendPushMessageAsync(myId, $"システムエラーが発生しました: {ex.Message}");
-        //         }
-        //         catch (Exception innerEx)
-        //         {
-        //     // LINE送信すら失敗した場合は、Azureのログに残すのみとする [cite: 426]
-        //             _logger.LogCritical(innerEx, "エラー通知の送信に失敗しました");
-        //         }
-        //     }
-        // }
         [Function("NotifyStudyStatusFunction")]
         public async Task Run([TimerTrigger("0 30 13 * * *")] TimerInfo myTimer)
         {
@@ -83,7 +42,24 @@ namespace BotForMedicalStudent
 
                     // 2. 日付を【yyyy-MM-dd】の形式で追加
                     sb.AppendLine($"【{todayJst:yyyy-MM-dd}】");
-                    string praiseMsg = _env.GetEnvironmentVariable("PRAISE_MESSAGE");
+
+                    var praiseMsg = "" ;
+                    if(studyCounts.Count<=10){
+                        praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_1_TO_10");
+                    }
+                    else if(studyCounts.Count<=20){
+                        praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_11_TO_20");
+                    }
+                    else if(studyCounts.Count<=30){
+                        praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_21_TO_30");
+                    }
+                    else if(studyCounts.Count<=40){
+                        praiseMsg = _env.GetEnvironmentVariable("MSG_FROM_31_TO_40");
+                    }
+                    else{
+                        //41問以上解いた場合
+                        praiseMsg = _env.GetEnvironmentVariable("MSG_ABOVE_41");
+                    }
                     sb.AppendLine(praiseMsg);
                     sb.AppendLine("\n【学習内容】");
                     foreach (var kvp in studyCounts)
