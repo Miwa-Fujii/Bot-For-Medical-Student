@@ -103,7 +103,7 @@ namespace BotForMedicalStudent
                     // 1件もない場合は、環境変数の警告メッセージを使う
                     var sb = new System.Text.StringBuilder();
                     sb.AppendLine($"【{todayJst:yyyy-MM-dd}】");
-                    sb.AppendLine($"{todayJst:hh:mm:ss}");
+                    sb.AppendLine($"{todayJst:HH:mm:ss}");
                     sb.AppendLine(_env.GetEnvironmentVariable("WARNING_MESSAGE"));
                     message = sb.ToString().TrimEnd();
                 }
