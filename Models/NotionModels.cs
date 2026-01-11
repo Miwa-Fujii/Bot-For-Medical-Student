@@ -1,26 +1,23 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace BotForMedicalStudent.Models
 {
-    // Notion APIへのクエリリクエスト
     public class NotionQueryRequest
     {
         [JsonPropertyName("filter")]
-        public NotionFilter Filter { get; set; } = null!; // 必ず値を入れるので null! を使用
+        public NotionFilter Filter { get; set; } = null!;
     }
 
     public class NotionFilter
     {
-        // "and": [ {日付フィルタ1}, {日付フィルタ2}, {ステータスフィルタ} ]
         [JsonPropertyName("and")]
-        public List<object> And { get; set; } = null!; // 検索条件リスト
+        public List<object> And { get; set; } = null!;
     }
 
-    // 日付フィルタ用
     public class NotionDateFilterContainer
     {
         [JsonPropertyName("property")]
+        //Notionのカラム名
         public string Property { get; set; } = "最終更新日時";
 
         [JsonPropertyName("date")]
@@ -30,34 +27,12 @@ namespace BotForMedicalStudent.Models
     public class NotionDateFilter
     {
         [JsonPropertyName("on_or_after")]
-        public string? OnOrAfter { get; set; } // JST 00:00のUTC値、null許容[cite: 368]
+        public string? OnOrAfter { get; set; } // JST 00:00のUTC値
 
         [JsonPropertyName("on_or_before")]
-        public string? OnOrBefore { get; set; } // JST 23:59のUTC値[cite: 370]
+        public string? OnOrBefore { get; set; } // JST 23:59のUTC値
     }
 
-    // ステータスフィルタ用
-    public class NotionStatusFilterContainer
-    {
-        [JsonPropertyName("property")]
-        public string Property { get; set; } = "ステータス";//カラム名
-
-        [JsonPropertyName("status")]
-        public NotionStatusFilter Status { get; set; } = null!;
-    }
-
-    public class NotionStatusFilter
-    {
-        [JsonPropertyName("does_not_equal")]
-        public string DoesNotEqual { get; set; } = "未着手"; // 除外する値を設定 [cite: 383]
-    }
-
-    // Notion API レスポンスを受け取るクラス
-    // public class NotionQueryResponse
-    // {
-    //     [JsonPropertyName("results")]
-    //     public List<object> Results { get; set; } = null!; // 結果が入るリスト,件数取得用 [cite: 390]
-    // }
     public class NotionQueryResponse
     {
         [JsonPropertyName("results")]
