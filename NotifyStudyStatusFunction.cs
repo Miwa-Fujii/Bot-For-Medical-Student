@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using BotForMedicalStudent.Services;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace BotForMedicalStudent
 {
@@ -22,8 +23,24 @@ namespace BotForMedicalStudent
             _logger = loggerFactory.CreateLogger<NotifyStudyStatusFunction>();
         }
 
-        [Function("NotifyStudyStatusFunction")]
-        public async Task Run([TimerTrigger("0 30 13 * * *")] TimerInfo myTimer)
+        [Function("NotifyStudyStatusTimer")]
+        public async Task RunTimer([TimerTrigger("0 30 13 * * *")] TimerInfo myTimer)
+        {
+            await ExecuteNotificationAsync();
+        }
+
+        [Function("NotifyStudyStatusHttp")]
+        public async Task<HttpResponseData> RunHttp([HttpTrigger(AuthorizationLevel.Function, "post", Route = "notify-status")] HttpRequestData req)
+        {
+            await ExecuteNotificationAsync();
+            var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
+            return response;
+        }
+
+        /// <summary>
+        /// 通知処理実行本体（共通ロジック）
+        /// </summary>
+        private async Task ExecuteNotificationAsync()
         {
             try
             {
