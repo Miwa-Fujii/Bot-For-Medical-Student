@@ -32,7 +32,12 @@ namespace BotForMedicalStudent
         [Function("NotifyStudyStatusHttp")]
         public async Task<HttpResponseData> RunHttp([HttpTrigger(AuthorizationLevel.Function, "post", Route = "notify-status")] HttpRequestData req)
         {
-            await ExecuteNotificationAsync();
+            // リクエストのボディ（中身）を読み取る
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            if (requestBody.Contains("進捗確認"))
+            {
+                await ExecuteNotificationAsync();
+            }
             var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
             return response;
         }
