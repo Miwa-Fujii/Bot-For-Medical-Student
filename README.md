@@ -13,6 +13,13 @@ NotionのDBから今日更新されたレコードを取得<br>
 ↓<br>
 LINE messaging API<br>
 公式LINEのトークルームに集計結果を送信<br>
+<br>
+<br>
+【実装時の注意】<br>
+・ローカルで実装する場合：<br>
+→→local.settings.jsonにAPI keyや各種メッセージを設定すること<br>
+・Azure functionsにデプロイする場合<br>
+→→環境変数にAPI keyや各種メッセージを設定すること
 
 
 
