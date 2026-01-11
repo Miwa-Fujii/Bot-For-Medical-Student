@@ -34,7 +34,7 @@ namespace BotForMedicalStudent
         {
             // リクエストのボディ（中身）を読み取る
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            if (requestBody.Contains("進捗確認"))
+            if (requestBody.Contains("集計"))
             {
                 await ExecuteNotificationAsync();
             }
