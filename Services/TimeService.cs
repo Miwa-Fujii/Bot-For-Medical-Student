@@ -10,8 +10,11 @@ namespace BotForMedicalStudent.Services
             var jstZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tokyo");
             var jstNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, jstZone);
 
-            // 今日の 00:00:00 と 23:59:59 を計算
-            var jstStart = jstNow.Date;
+            // 日付の境界を午前3時とするため、現在時刻が3時未満の場合は前日扱いにする
+            var targetDate = jstNow.Hour < 3 ? jstNow.Date.AddDays(-1) : jstNow.Date;
+
+            // 今日の 03:00:00 と 翌日の 02:59:59 を計算
+            var jstStart = targetDate.AddHours(3);
             var jstEnd = jstStart.AddDays(1).AddTicks(-1);
 
             // Notion APIが要求するUTCのISO 8601形式に変換して返却
